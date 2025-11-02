@@ -19,6 +19,10 @@ The retrieved file contains encoded data written in the Brainfuck esoteric langu
 
 [Brainfuck Language](https://www.dcode.fr/brainfuck-language)
 
-The decoded string provides a private SSH key.
-# Private SSH Key
-The private SSH key does not reveal any corresponding user. Thus, use the filename as username.
+The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key`.
+# Private OpenSSH Key
+The private OpenSSH key does not reveal any corresponding user. Thus, use the filename as username during its first usage.
+
+`ssh -i contain-linux.key <redacted>@contain-linux.thm`
+
+
