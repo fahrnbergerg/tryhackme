@@ -1,4 +1,4 @@
-## Step 1: Add `contain-linux.thm` to `/etc/hosts`
+# Step 1: Add `contain-linux.thm` to `/etc/hosts`
 
 To make your system resolve the hostname `contain-linux.thm` to the assigned IP address, follow these steps:
 
