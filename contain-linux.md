@@ -31,4 +31,9 @@ The usage of the private OpenSSH key prompt for a passphrase. Convert the privat
 
 Run a wordlist attack with John and `rockyou.txt`.
 
-``
+`john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash`
+
+It takes a long time until John outputs the correct passphrase. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
+
+`ssh -i contain-linux.key <redacted>@contain-linux.thm`
+# `user.txt`
