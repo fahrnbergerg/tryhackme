@@ -25,4 +25,10 @@ The private OpenSSH key does not reveal any corresponding user. Thus, use the fi
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm`
 
+The usage of the private OpenSSH key prompt for a passphrase. Convert the private OpenSSH key to a John-compatible hash.
 
+`/opt/john/ssh2john.py contain-linux.key > contain-linux.hash`
+
+Run a wordlist attack with John and `rockyou.txt`.
+
+``
