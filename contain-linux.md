@@ -37,3 +37,18 @@ It takes a long time until John outputs the correct passphrase. Accessing `conta
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm`
 # `user.txt`
+Find and the expected file `user.txt` inside the home directory.
+
+`cat user.txt`
+
+It reads illegible content rather than the expected user flag. Thus, analyze it thoroughly.
+
+`file user.txt`
+
+Since it turns out to be a zip file, try to unzip it.
+
+`unzip user.txt`
+
+A password protects the zip file. Hence, convert it to a John-compatible hash.
+
+`/opt/john/zip2john.py user.txt > user.hash`
