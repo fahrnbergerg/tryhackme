@@ -17,6 +17,6 @@ This enumeration discovers a file named \<redacted\> on the webroot.
 # Decoding File Content
 The retrieved file contains encoded data written in the Brainfuck esoteric language. Decode that content using an online decoder.
 
-
+[Brainfuck Language](https://www.dcode.fr/brainfuck-language)
 
 The decoded string provides a private SSH key.
