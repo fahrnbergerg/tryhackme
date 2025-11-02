@@ -13,4 +13,10 @@ Enumerate directories and files on the web server using gobuster.
 
 `gobuster dir -u http://contain-linux.thm -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,htm,txt`
 
-This enumeration discovered a file named \<redacted\> on the webroot.
+This enumeration discovers a file named \<redacted\> on the webroot.
+# Decoding File Content
+The retrieved file contains encoded data written in the Brainfuck esoteric language. Decode that content using an online decoder.
+
+
+
+The decoded string provides a private SSH key.
