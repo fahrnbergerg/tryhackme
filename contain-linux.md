@@ -63,7 +63,7 @@ Starting gobuster in directory enumeration mode
 /.html                (Status: 403) [Size: 282]
 /.htm                 (Status: 403) [Size: 282]
 /index.html           (Status: 200) [Size: 10671]
-/\<redacted\>         (Status: 200) [Size: 4372]
+/<redacted>           (Status: 200) [Size: 4372]
 /server-status        (Status: 403) [Size: 282]
 Progress: 1091375 / 1091380 (100.00%)
 ===============================================================
