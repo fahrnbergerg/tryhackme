@@ -86,7 +86,7 @@ Enter passphrase:
 </pre>
 The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash and catch a glimpse of it.
 
-`/opt/john/ssh2john.py contain-linux.key | cut -d':' -f2- > contain-linux.hash` (Attacker Machine)
+`ssh2john contain-linux.key | cut -d':' -f2- > contain-linux.hash` (Attacker Machine)
 
 `cat contain-linux.hash` (Attacker Machine)
 <pre>
@@ -204,24 +204,49 @@ Since it turns out to be a zip file, try to unzip it.
 </pre>
 Since the target machine lacks the `unzip` command, copy `user.txt`to the attacker machine.
 
-`scp -i contain-linux.key <redacted>@contain-linux.thm:~/user.txt .`
+`scp -i contain-linux.key <redacted>@contain-linux.thm:~/user.txt .` (Attacker Machine)
 <pre>
 Enter passphrase for key 'contain-linux.key': 
 user.txt
 </pre>
+Try to unzip it on the attacker machine.
+
+`unzip user.txt` (Attacker Machine)
+<pre>
+Archive:  user.txt
+[user.txt] test.txt password: 
+</pre>
 A password protects the zip file. Hence, convert it to a John-compatible hash.
 
-`/opt/john/zip2john.py user.txt > user.hash` (Attacker Machine)
-
+`zip2john user.txt > user.hash` (Attacker Machine)
+<pre>
+ver 2.0 efh 5455 efh 7875 user.txt/test.txt PKZIP Encr: 2b chk, TS_chk, cmplen=55, decmplen=44, crc=4805F81A type=8
+</pre>
 Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt user.hash` (Attacker Machine)
-
-Again, it takes a long time until John outputs the correct password. Nonetheless, unzipping `user.txt` extracts `user.txt`, i.e., the archive overwrites itself.
+<pre>
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+&lt;redacted&gt;       (user.txt/test.txt)
+1g 0:00:00:02 DONE (2025-11-03 21:10) 0.3787g/s 5039Kp/s 5039Kc/s 5039KC/s 12eelhsa..129791
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
+</pre>
+John outputs the password very quickly. Use it to unzip `user.txt`.
 
 `unzip user.txt` (Attacker Machine)
+<pre>
+Archive:  user.txt
+[user.txt] test.txt password: 
+  inflating: test.txt
+</pre>
+Unzipping `user.txt` extracts `test.txt`. Catch a glimpse of `test.txt` to retrieve the user flag.
 
-The extracted `user.txt` file contains the expected user flag.
-
-`cat user.txt` (Attacker Machine)
+`cat test.txt`
+<pre>
+THM{&lt;redacted&gt;}
+</pre>
 # Privilege Escalation to root
