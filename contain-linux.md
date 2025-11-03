@@ -78,7 +78,7 @@ The retrieved file contains encoded data written in the Brainfuck esoteric langu
 
 The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key` and restrict it to read permission for the owner.
 # Private OpenSSH Key
-The private OpenSSH key does not reveal any corresponding user. Use it first by printing its accordant public OpenSSH key.
+Since this private OpenSSH key does not reveal any corresponding user for initial access, further research will be necessary. Nonetheless, use it first by printing its accordant public OpenSSH key.
 
 `ssh-keygen -y -f contain-linux.key` (Attacker Machine)
 <pre>
