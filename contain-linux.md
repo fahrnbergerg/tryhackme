@@ -1,7 +1,7 @@
 # Add `contain-linux.thm` to `/etc/hosts`
 Add the target hostname to your attacker machine's `/etc/hosts` file (root required).
 
-`echo '<IPv4 address of target hostname> contain-linux.thm' >> /etc/hosts` (Attacker Machine)
+`echo "<IPv4 address of target hostname> contain-linux.thm" >> /etc/hosts` (Attacker Machine)
 # Active Scanning / Network Discovery
 First and foremost, run a full port scan with Nmap to find open ports, services, and versions.
 
