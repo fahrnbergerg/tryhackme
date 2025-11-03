@@ -43,12 +43,25 @@ Find and the expected file `user.txt` inside the home directory.
 
 It reads illegible content rather than the expected user flag. Thus, analyze it thoroughly.
 
-`file user.txt`
+`file user.txt` (Target Machine)
 
 Since it turns out to be a zip file, try to unzip it.
 
-`unzip user.txt`
+`unzip user.txt` (Attacker Machine)
 
 A password protects the zip file. Hence, convert it to a John-compatible hash.
 
 `/opt/john/zip2john.py user.txt > user.hash` (Attacker Machine)
+
+Run a wordlist attack with John and `rockyou.txt`.
+
+`john --wordlist=/usr/share/wordlists/rockyou.txt user.hash` (Attacker Machine)
+
+Again, it takes a long time until John outputs the correct password. Nonetheless, unzipping `user.txt` extracts `user.txt`, i.e., the archive overwrites itself.
+
+`unzip user.txt` (Attacker Machine)
+
+The extracted `user.txt` file contains the expected user flag.
+
+`cat user.txt` (Attacker Machine)
+# Privilege Escalation to root
