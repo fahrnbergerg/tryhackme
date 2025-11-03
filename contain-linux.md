@@ -186,18 +186,29 @@ Deadline:
 - If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
 </pre>
 # `user.txt`
-Find and the expected file `user.txt` inside the home directory.
+Since you do not want any money, ignore the ransom demand. Find and the expected file `user.txt` inside the home directory.
 
 `cat user.txt` (Target Machine)
 
 It reads illegible content rather than the expected user flag. Thus, analyze it thoroughly.
 
 `file user.txt` (Target Machine)
-
+<pre>
+user.txt: Zip archive data, at least v2.0 to extract, compression method=deflate
+</pre>
 Since it turns out to be a zip file, try to unzip it.
 
-`unzip user.txt` (Attacker Machine)
+`unzip user.txt` (Target Machine)
+<pre>
+-bash: unzip: command not found
+</pre>
+Since the target machine lacks the `unzip` command, copy `user.txt`to the attacker machine.
 
+`scp -i contain-linux.key <redacted>@contain-linux.thm:~/user.txt .`
+<pre>
+Enter passphrase for key 'contain-linux.key': 
+user.txt
+</pre>
 A password protects the zip file. Hence, convert it to a John-compatible hash.
 
 `/opt/john/zip2john.py user.txt > user.hash` (Attacker Machine)
