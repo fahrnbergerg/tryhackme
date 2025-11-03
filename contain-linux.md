@@ -76,12 +76,18 @@ The retrieved file contains encoded data written in the Brainfuck esoteric langu
 
 [Brainfuck Language](https://www.dcode.fr/brainfuck-language) (Attacker Machine)
 
-The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key`.
+The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key` and restrict it to read permission for the owner.
 # Private OpenSSH Key
 The private OpenSSH key does not reveal any corresponding user. Thus, use the filename as username during its first usage.
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
-
+<pre>
+The authenticity of host 'contain-linux.thm (10.10.214.82)' can't be established.
+ECDSA key fingerprint is SHA256:TacqfIcOT2jMwLPHRQFjL8Hgjcn4tGlPz/5F8DRz6Zc.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'contain-linux.thm' (ECDSA) to the list of known hosts.
+Enter passphrase for key 'contain-linux.key':
+</pre>
 The usage of the private OpenSSH key prompt for a passphrase. Convert the private OpenSSH key to a John-compatible hash.
 
 `/opt/john/ssh2john.py contain-linux.key > contain-linux.hash` (Attacker Machine)
