@@ -6,6 +6,7 @@ Add the target hostname to your attacker machine's `/etc/hosts` file (root requi
 First and foremost, run a full port scan with Nmap to find open ports, services, and versions.
 
 `nmap -A -p- -sC -sV contain-linux.thm` (Attacker Machine)
+<pre>
 Nmap scan report for contain-linux.thm
 Host is up (0.00037s latency).
 Not shown: 65533 closed ports
@@ -37,7 +38,7 @@ HOP RTT     ADDRESS
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 21.19 seconds
-
+</pre>
 The scan returns an open SSH service on default TCP port 22 and an open HTTP service on default port 80.
 # Web Enumeration (Port 80)
 Enumerate directories and files on the web server using gobuster.
