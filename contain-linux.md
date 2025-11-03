@@ -44,7 +44,32 @@ The scan returns an open SSH service on default TCP port 22 and an open HTTP ser
 Enumerate directories and files on the web server using gobuster.
 
 `gobuster dir -u http://contain-linux.thm -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,htm,txt` (Attacker Machine)
-
+<pre>
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://contain-linux.thm
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,html,htm,txt
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.html                (Status: 403) [Size: 282]
+/.htm                 (Status: 403) [Size: 282]
+/index.html           (Status: 200) [Size: 10671]
+/user.txt             (Status: 200) [Size: 4372]
+/server-status        (Status: 403) [Size: 282]
+Progress: 1091375 / 1091380 (100.00%)
+===============================================================
+Finished
+===============================================================
+</pre>
 This enumeration discovers a file named \<redacted\> on the webroot.
 # Decoding File Content
 The retrieved file contains encoded data written in the Brainfuck esoteric language. Decode that content using an online decoder.
