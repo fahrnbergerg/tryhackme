@@ -186,7 +186,7 @@ Deadline:
 - If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
 </pre>
 # `user.txt`
-Since you do not want any money, ignore the ransom demand. Find and the expected file `user.txt` inside the home directory.
+Since you do not want to pay any money, ignore the ransom demand. Find and the expected file `user.txt` inside the home directory.
 
 `cat user.txt` (Target Machine)
 
