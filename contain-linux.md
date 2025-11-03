@@ -95,13 +95,36 @@ The usage of the private OpenSSH key prompts for a passphrase. Convert the priva
 Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash` (Attacker Machine)
-
-Since this command would obviously take a long time to finish, reverse the lines in `rockyou.txt` and launch a second wordlist attack.
+<pre>
+Note: This format may emit false positives, so it will keep trying even after finding a
+possible candidate.
+Warning: detected hash type "SSH", but the string is also recognized as "ssh-opencl"
+Use the "--format=ssh-opencl" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (SSH [RSA/DSA/EC/OPENSSH (SSH private keys) 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 0 for all loaded hashes
+Cost 2 (iteration count) is 24 for all loaded hashes
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+</pre>
+Since this worklist attack would obviously take a long time to finish, abort it, reverse the lines in `rockyou.txt`, and relaunch the wordlist attack.
 
 `tac /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt` (Attacker Machine)
-`john --wordlist=/tmp/rockyou.txt contain-linux.hash` (Attacker Machine)
 
-The second attack briskly outputs the correct passphrase. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
+`john --wordlist=/tmp/rockyou.txt contain-linux.hash` (Attacker Machine)
+<pre>
+Note: This format may emit false positives, so it will keep trying even after finding a
+possible candidate.
+Warning: detected hash type "SSH", but the string is also recognized as "ssh-opencl"
+Use the "--format=ssh-opencl" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (SSH [RSA/DSA/EC/OPENSSH (SSH private keys) 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 0 for all loaded hashes
+Cost 2 (iteration count) is 24 for all loaded hashes
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+</pre>
+The second attack outputs the correct passphrase after a while. Accessing `contain-linux.thm` through the recent ssh command and the descried passphrase succeeds.
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
 # `user.txt`
