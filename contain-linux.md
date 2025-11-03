@@ -88,10 +88,14 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added 'contain-linux.thm' (ECDSA) to the list of known hosts.
 Enter passphrase for key 'contain-linux.key':
 </pre>
-The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash.
+The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash and catch a glimpse of it.
 
 `/opt/john/ssh2john.py contain-linux.key > contain-linux.hash` (Attacker Machine)
 
+`cat contain-linux.hash` (Attacker Machine)
+<pre>
+contain-linux.key:$sshng$6$16$ce1f3b2d872c026f3f2707c4d2f936f8$290$6f70656e7373682d6b65792d7631000000000a6165733235362d637472000000066263727970740000001800000010ce1f3b2d872c026f3f2707c4d2f936f80000001800000001000000330000000b7373682d656432353531390000002061930510e0d95bbd1db82114af7157a07e5f43ee051f5c55b41603059fc9cb90000000a0932b4b4d7576b0c7443f30d0e0e9bc6a77946da35292f4b1e0dcb9b8616b91af5dfbda383f0b5487416b664f0f8e1009c65c8d5527c27b6dea27bab8e7bfc9c0340cf4d15bad2c0f59fac4ae8fb7f05bb97aaeb8c7a566dd66b4eaee9c8793feadeb7b4fafcd1c801d142434615155b3f8978b1e5ec36743df0fee10cc4a9c24408ed95d2f7a65559429468af73fcc8ca69f35bec253c46eae302dd5ded0b801$24$130
+</pre>
 Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash` (Attacker Machine)
