@@ -190,7 +190,7 @@ Since you do not want to pay any money, ignore the ransom demand. Find and the e
 
 `cat user.txt` (Target Machine)
 
-It reads illegible content rather than the expected user flag. Thus, analyze it thoroughly.
+It reads illegible content rather than the expected user flag, blatantly through the ransomware. Thus, analyze it thoroughly.
 
 `file user.txt` (Target Machine)
 <pre>
@@ -216,7 +216,7 @@ Try to unzip it on the attacker machine.
 Archive:  user.txt
 [user.txt] test.txt password: 
 </pre>
-A password protects the zip file. Hence, convert it to a John-compatible hash.
+The ransomware has secured the zip file with a password. Hence, convert it to a John-compatible hash.
 
 `zip2john user.txt > user.hash` (Attacker Machine)
 <pre>
@@ -250,3 +250,53 @@ Unzipping `user.txt` extracts `test.txt`. Catch a glimpse of `test.txt` to retri
 THM{&lt;redacted&gt;}
 </pre>
 # Privilege Escalation to root
+All famous enumeration tools like `linenum.sh`, `linpeas.sh`, `linuxprivchecker.py`, or `lse.sh` fail to reveal any approach for privilege escalation. Simply switch to root with the user flag as password.
+
+`su -`
+<pre>
+Password: 
+......
+***** Your Files Have Been Encrypted *****
+
+Oops! Some files in your home directory have been encrypted using strong cryptography.
+
+What happened?
+- Your important files are now inaccessible.
+- Attempting to modify or recover your files without the proper decryption key will result in permanent data loss.
+
+How to recover your files?
+- Send payment of 1 BTC to the following address: bc1qhv6m5ssfldakjvdn4r9vtfqskjscfleefpn2v3
+- E-mail your proof of payment and your unique ID: contain.linux@gmail.com
+- After verification, you will receive the decryption instructions.
+
+What you must NOT do?
+- Turn off your computer.
+- Try to recover or modify encrypted files.
+- Seek help from third parties before contacting us.
+
+Deadline:
+- If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
+</pre>
+The ransomware has apparently infested the root account, too. Since you still do not want to pay any money, also ignore this ransom demand. Nonetheless, the file `root.txt` resides in root's home directory as expected. Catch a glimpse of it.
+
+`cat root.txt`
+
+It shapes up as illegible as `user.txt` due to infestation by the ransomware. Analyze it thoroughly.
+
+`file root.txt`
+<pre>
+root.txt: openssl enc'd data with salted password
+</pre>
+You will fail with all attempts to decrypt it. Rather search for a backup of `root.txt`, the last resort in case of ransomware infestation.
+
+`find / -name root.txt 2>/dev/null`
+<pre>
+/root/root.txt
+&lt;redacted&gt;
+</pre>
+Catch a glimpse of the found backup file and acquire the root flag.
+
+`cat <redacted>`
+<pre>
+THM{&lt;redacted&gt;}
+</pre>
