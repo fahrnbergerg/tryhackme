@@ -249,7 +249,7 @@ Unzipping `user.txt` extracts `test.txt`. Catch a glimpse of `test.txt` to retri
 <pre>
 THM{&lt;redacted&gt;}
 </pre>
-# Privilege Escalation to root
+# Privilege Escalation to root and `root.txt`
 All famous enumeration tools like `linenum.sh`, `linpeas.sh`, `linuxprivchecker.py`, or `lse.sh` fail to reveal any approach for privilege escalation. Simply switch to root with the user flag as password.
 
 `su -`
