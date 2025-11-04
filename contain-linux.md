@@ -1,9 +1,9 @@
 # Add `contain-linux.thm` to `/etc/hosts`
-Add the target hostname to your attacker machine's `/etc/hosts` file (root required).
+Append the target hostname to `/etc/hosts` on the attacker machine (root rights required).
 
 `echo "<IPv4 address of target hostname> contain-linux.thm" >> /etc/hosts` (Attacker Machine)
 # Active Scanning / Network Discovery
-First and foremost, run a full port scan with Nmap to find open ports, services, and versions.
+Run a full Nmap port scan to discover open ports, services, and versions.
 
 `nmap -A -p- -sC -sV contain-linux.thm` (Attacker Machine)
 <pre>
@@ -39,9 +39,9 @@ HOP RTT     ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 21.19 seconds
 </pre>
-The scan returns an open SSH service on default TCP port 22 and an open HTTP service on default port 80.
+The scan reveals SSH on TCP 22 and HTTP on TCP 80.
 # Web Enumeration (Port 80)
-Enumerate directories and files on the web server using gobuster.
+Gather directories and files on the web server with Gobuster.
 
 `gobuster dir -u http://contain-linux.thm -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,htm,txt` (Attacker Machine)
 <pre>
@@ -70,21 +70,21 @@ Progress: 1091375 / 1091380 (100.00%)
 Finished
 ===============================================================
 </pre>
-This enumeration discovers an interesting file on the webroot.
+Enumeration uncovers an interesting file inside the webroot.
 # Decoding File Content
-The retrieved file contains encoded data written in the Brainfuck esoteric language. Decode that content using an online decoder.
+The retrieved file contains code written in the Brainfuck esoteric language. Decode the string with an online converter.
 
 [Brainfuck Language](https://www.dcode.fr/brainfuck-language) (Attacker Machine)
 
-The decoded string provides a private OpenSSH key. Save the decoded private OpenSSH key in the file `contain-linux.key` and restrict it to read permission for the owner.
+The decoded output yields a private OpenSSH key. Save it as `contain-linux.key` and restrict permission to owner‑read.
 # Private OpenSSH Key
-Since this private OpenSSH key does not reveal any corresponding user for initial access, further research will be necessary. Nonetheless, use it first by printing its accordant public OpenSSH key.
+No user information appears inside the key, so additional research remains necessary. Print the matching public OpenSSH key first.
 
 `ssh-keygen -y -f contain-linux.key` (Attacker Machine)
 <pre>
 Enter passphrase: 
 </pre>
-The usage of the private OpenSSH key prompts for a passphrase. Convert the private OpenSSH key to a John-compatible hash and catch a glimpse of it.
+The command prompts for a passphrase. Convert the private key into a John‑compatible hash for inspection.
 
 `ssh2john contain-linux.key | cut -d':' -f2- > contain-linux.hash` (Attacker Machine)
 
@@ -92,7 +92,7 @@ The usage of the private OpenSSH key prompts for a passphrase. Convert the priva
 <pre>
 $sshng$6$16$ce1f3b2d872c026f3f2707c4d2f936f8$290$6f70656e7373682d6b65792d7631000000000a6165733235362d637472000000066263727970740000001800000010ce1f3b2d872c026f3f2707c4d2f936f80000001800000001000000330000000b7373682d656432353531390000002061930510e0d95bbd1db82114af7157a07e5f43ee051f5c55b41603059fc9cb90000000a0932b4b4d7576b0c7443f30d0e0e9bc6a77946da35292f4b1e0dcb9b8616b91af5dfbda383f0b5487416b664f0f8e1009c65c8d5527c27b6dea27bab8e7bfc9c0340cf4d15bad2c0f59fac4ae8fb7f05bb97aaeb8c7a566dd66b4eaee9c8793feadeb7b4fafcd1c801d142434615155b3f8978b1e5ec36743df0fee10cc4a9c24408ed95d2f7a65559429468af73fcc8ca69f35bec253c46eae302dd5ded0b801$24$130
 </pre>
-Run a wordlist attack with John and `rockyou.txt`.
+Run John the Ripper against the hash and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt contain-linux.hash` (Attacker Machine)
 <pre>
@@ -103,7 +103,7 @@ Cost 2 (iteration count) is 24 for all loaded hashes
 Will run 2 OpenMP threads
 Press 'q' or Ctrl-C to abort, almost any other key for status
 </pre>
-Retrieving John's status by pressing any key apart from `q` or `Ctrl-C` reveals a too long time to finish. A second glimpse of `contain-linux.key` reveals a useful hint in the last line.
+Status updates show impractically long runtime. Inspecting `contain-linux.key` again uncovers a useful hint within the last line.
 
 `cat contain-linux.key` (Attacker Machine)
 <pre>
@@ -117,11 +117,11 @@ uXquuMelZt1mtOrunIeT/q3re0+vzRyAHRQkNGFRVbP4l4seXsNnQ98P7hDMSpwkQI7ZXS
 -----END OPENSSH PRIVATE KEY-----
 ^[0-9]{2}[a-z]{7}$
 </pre>
-It seems to be a regular expression applicable to `rockyou.txt`.
+Create a filtered wordlist according to that regular expression.
 
-`grep -E "^[0-9]{2}[a-z]{7}$" /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt`
+`grep -E "^[0-9]{2}[a-z]{7}$" /usr/share/wordlists/rockyou.txt > /tmp/rockyou.txt` (Attacker Machine)
 
-Launch another wordlist attack with John and the shaped `rockyou.txt`.
+Run a second John attack with the reduced list.
 
 `john --wordlist=/tmp/rockyou.txt contain-linux.hash` (Attacker Machine)
 <pre>
@@ -136,14 +136,14 @@ Press 'q' or Ctrl-C to abort, almost any other key for status
 Use the "--show" option to display all of the cracked passwords reliably
 Session completed.
 </pre>
-The second attack outputs the correct passphrase after a while. Use the private OpenSSH key again by printing its accordant public OpenSSH key.
+Print the public key again.
 
 `ssh-keygen -y -f contain-linux.key` (Attacker Machine)
 <pre>
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGGTBRDg2Vu9HbghFK9xV6B+X0PuBR9cVbQWAwWfycuQ &lt;redacted&gt;@contain-linux
 </pre>
 
-The comment of the public OpenSSH key reveals the username for initial access. Access `contain-linux.thm` with SSH, the private OpenSSH key and its passphrase.
+The public key comment exposes the username for initial access. Access `contain-linux.thm` via SSH using the key and its passphrase.
 
 `ssh -i contain-linux.key <redacted>@contain-linux.thm` (Attacker Machine)
 <pre>
@@ -186,11 +186,11 @@ Deadline:
 - If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
 </pre>
 # `user.txt`
-Since you do not want to pay any money, ignore the ransom demand. Find and the expected file `user.txt` inside the home directory.
+Ignore the ransom demand and look for `user.txt` inside the home directory.
 
 `cat user.txt` (Target Machine)
 
-It reads illegible content rather than the expected user flag, blatantly through the ransomware. Thus, analyze it thoroughly.
+The file contains illegible data instead of the flag. Analyze its type.
 
 `file user.txt` (Target Machine)
 <pre>
@@ -202,27 +202,27 @@ Since it turns out to be a zip file, try to unzip it.
 <pre>
 -bash: unzip: command not found
 </pre>
-Since the target machine lacks the `unzip` command, copy `user.txt`to the attacker machine.
+The system lacks `unzip`, so copy the archive to the attacker machine.
 
 `scp -i contain-linux.key <redacted>@contain-linux.thm:~/user.txt .` (Attacker Machine)
 <pre>
 Enter passphrase for key 'contain-linux.key': 
 user.txt
 </pre>
-Try to unzip it on the attacker machine.
+Unzip locally.
 
 `unzip user.txt` (Attacker Machine)
 <pre>
 Archive:  user.txt
 [user.txt] test.txt password: 
 </pre>
-The ransomware has secured the zip file with a password. Hence, convert it to a John-compatible hash.
+Password protection prevents extraction. Convert the archive to a John‑compatible hash.
 
 `zip2john user.txt > user.hash` (Attacker Machine)
 <pre>
 ver 2.0 efh 5455 efh 7875 user.txt/test.txt PKZIP Encr: 2b chk, TS_chk, cmplen=55, decmplen=44, crc=4805F81A type=8
 </pre>
-Run a wordlist attack with John and `rockyou.txt`.
+Run a wordlist attack with John and `rockyou.txt`.
 
 `john --wordlist=/usr/share/wordlists/rockyou.txt user.hash` (Attacker Machine)
 <pre>
@@ -235,7 +235,7 @@ Press 'q' or Ctrl-C to abort, almost any other key for status
 Use the "--show" option to display all of the cracked passwords reliably
 Session completed.
 </pre>
-John outputs the password very quickly. Use it to unzip `user.txt`.
+Use that password to unzip `user.txt`.
 
 `unzip user.txt` (Attacker Machine)
 <pre>
@@ -243,16 +243,16 @@ Archive:  user.txt
 [user.txt] test.txt password: 
   inflating: test.txt
 </pre>
-Unzipping `user.txt` extracts `test.txt`. Catch a glimpse of `test.txt` to retrieve the user flag.
+Display `user.txt` to obtain the user flag.
 
-`cat test.txt`
+`cat test.txt` (Attacker Machine)
 <pre>
 THM{&lt;redacted&gt;}
 </pre>
 # Privilege Escalation to root and `root.txt`
-All famous enumeration tools like `linenum.sh`, `linpeas.sh`, `linuxprivchecker.py`, or `lse.sh` fail to reveal any approach for privilege escalation. Simply switch to root with the user flag as password.
+Common enumeration scripts (`linenum.sh`, `linpeas.sh`, `linuxprivchecker.py`, `lse.sh`) yield no path toward escalation. Attempt a user switch to root with the obtained flag as password.
 
-`su -`
+`su -` (Target Machine)
 <pre>
 Password: 
 ......
@@ -277,26 +277,26 @@ What you must NOT do?
 Deadline:
 - If we do not receive payment within two hours, your decryption key will be destroyed and your files will be lost forever.
 </pre>
-The ransomware has apparently infested the root account, too. Since you still do not want to pay any money, also ignore this ransom demand. Nonetheless, the file `root.txt` resides in root's home directory as expected. Catch a glimpse of it.
+The ransomware affects root as well. Ignore that message and read `root.txt` inside the root home directory.
 
-`cat root.txt`
+`cat root.txt` (Target Machine)
 
-It shapes up as illegible as `user.txt` due to infestation by the ransomware. Analyze it thoroughly.
+The content appears unreadable. Determine the file type.
 
-`file root.txt`
+`file root.txt` (Target Machine)
 <pre>
 root.txt: openssl enc'd data with salted password
 </pre>
-You will fail with all attempts to decrypt it. Rather search for a backup of `root.txt`, the last resort in case of ransomware infestation.
+Decryption fails for all attempts. Search the filesystem for a backup of `root.txt`.
 
-`find / -name root.txt 2>/dev/null`
+`find / -name root.txt 2>/dev/null` (Target Machine)
 <pre>
 /root/root.txt
 &lt;redacted&gt;
 </pre>
-Catch a glimpse of the found backup file and acquire the root flag.
+View the located backup and retrieve the root flag.
 
-`cat <redacted>`
+`cat <redacted>` (Target Machine)
 <pre>
 THM{&lt;redacted&gt;}
 </pre>
