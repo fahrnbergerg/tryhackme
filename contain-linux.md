@@ -77,6 +77,8 @@ The retrieved file contains code written in the Brainfuck esoteric language. Dec
 [Brainfuck Language](https://www.dcode.fr/brainfuck-language) (Attacker Machine)
 
 The decoded output yields a private OpenSSH key. Save it as `contain-linux.key` and restrict permission to owner‑read.
+
+`chmod 400 contain-linux.key`
 # Private OpenSSH Key
 No user information appears inside the key, so additional research remains necessary. Print the matching public OpenSSH key first.
 
